@@ -1,4 +1,4 @@
-namespace PortfolioManagementAPI.Core.Entities;
+﻿namespace PortfolioManagementAPI.Core.Entities;
 
 public abstract class BaseEntity
 {

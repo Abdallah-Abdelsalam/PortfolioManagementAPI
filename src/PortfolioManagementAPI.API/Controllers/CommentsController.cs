@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using PortfolioManagementAPI.API.DTOs;
 using PortfolioManagementAPI.Core.Interfaces;
+using PortfolioManagementAPI.Core.Entities;
 using System.Security.Claims;
 
 namespace PortfolioManagementAPI.API.Controllers;
@@ -42,20 +43,20 @@ public class CommentsController : ControllerBase
     public async Task<ActionResult<CommentResponse>> CreateComment(int projectId, [FromBody] CreateCommentRequest request)
     {
         var project = await _projectRepository.GetByIdAsync(projectId);
-
+        
         if (project == null)
             return NotFound(new { message = $"Project with ID {projectId} not found" });
-
+        
         var userId = GetCurrentUserId();
-
+        
         var comment = _mapper.Map<Comment>(request);
         comment.ProjectId = projectId;
         comment.UserId = userId;
         comment.CreatedAt = DateTime.UtcNow;
-
+        
         var createdComment = await _commentRepository.AddAsync(comment);
         var commentResponse = _mapper.Map<CommentResponse>(createdComment);
-
+        
         return Ok(commentResponse);
     }
 
@@ -63,19 +64,19 @@ public class CommentsController : ControllerBase
     public async Task<IActionResult> UpdateComment(int id, [FromBody] UpdateCommentRequest request)
     {
         var comment = await _commentRepository.GetByIdAsync(id);
-
+        
         if (comment == null)
             return NotFound(new { message = $"Comment with ID {id} not found" });
-
+        
         var userId = GetCurrentUserId();
         if (comment.UserId != userId)
             return Forbid();
-
+        
         _mapper.Map(request, comment);
         comment.UpdatedAt = DateTime.UtcNow;
-
+        
         await _commentRepository.UpdateAsync(comment);
-
+        
         return Ok(new { message = "Comment updated successfully" });
     }
 
@@ -83,18 +84,18 @@ public class CommentsController : ControllerBase
     public async Task<IActionResult> DeleteComment(int id)
     {
         var comment = await _commentRepository.GetByIdAsync(id);
-
+        
         if (comment == null)
             return NotFound(new { message = $"Comment with ID {id} not found" });
-
+        
         var userId = GetCurrentUserId();
         if (comment.UserId != userId)
             return Forbid();
-
+        
         comment.IsActive = false;
         comment.UpdatedAt = DateTime.UtcNow;
         await _commentRepository.UpdateAsync(comment);
-
+        
         return Ok(new { message = "Comment deleted successfully" });
     }
 }

@@ -1,4 +1,4 @@
-namespace PortfolioManagementAPI.API.DTOs;
+﻿namespace PortfolioManagementAPI.API.DTOs;
 
 public class ProjectResponse
 {
@@ -13,7 +13,6 @@ public class ProjectResponse
     public int LikeCount { get; set; }
     public int CommentCount { get; set; }
     public bool IsLikedByCurrentUser { get; set; }
-    public List<CommentResponse>? Comments { get; set; }
 }
 
 public class CreateProjectRequest
