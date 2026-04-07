@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using PortfolioManagementAPI.API.DTOs;
 using PortfolioManagementAPI.Core.Interfaces;
+using PortfolioManagementAPI.Core.Entities;
 using System.Security.Claims;
 
 namespace PortfolioManagementAPI.API.Controllers;
@@ -40,10 +41,10 @@ public class PortfoliosController : ControllerBase
     public async Task<ActionResult<PortfolioResponse>> GetPortfolio(int id)
     {
         var portfolio = await _portfolioRepository.GetPortfolioWithProjectsAsync(id);
-
+        
         if (portfolio == null)
             return NotFound(new { message = $"Portfolio with ID {id} not found" });
-
+        
         var portfolioResponse = _mapper.Map<PortfolioResponse>(portfolio);
         return Ok(portfolioResponse);
     }
@@ -52,14 +53,14 @@ public class PortfoliosController : ControllerBase
     public async Task<ActionResult<PortfolioResponse>> CreatePortfolio([FromBody] CreatePortfolioRequest request)
     {
         var userId = GetCurrentUserId();
-
+        
         var portfolio = _mapper.Map<Portfolio>(request);
         portfolio.UserId = userId;
         portfolio.CreatedAt = DateTime.UtcNow;
-
+        
         var createdPortfolio = await _portfolioRepository.AddAsync(portfolio);
         var portfolioResponse = _mapper.Map<PortfolioResponse>(createdPortfolio);
-
+        
         return CreatedAtAction(nameof(GetPortfolio), new { id = createdPortfolio.Id }, portfolioResponse);
     }
 
@@ -67,19 +68,19 @@ public class PortfoliosController : ControllerBase
     public async Task<IActionResult> UpdatePortfolio(int id, [FromBody] UpdatePortfolioRequest request)
     {
         var portfolio = await _portfolioRepository.GetByIdAsync(id);
-
+        
         if (portfolio == null)
             return NotFound(new { message = $"Portfolio with ID {id} not found" });
-
+        
         var userId = GetCurrentUserId();
         if (portfolio.UserId != userId)
             return Forbid();
-
+        
         _mapper.Map(request, portfolio);
         portfolio.UpdatedAt = DateTime.UtcNow;
-
+        
         await _portfolioRepository.UpdateAsync(portfolio);
-
+        
         return Ok(new { message = "Portfolio updated successfully" });
     }
 
@@ -87,18 +88,18 @@ public class PortfoliosController : ControllerBase
     public async Task<IActionResult> DeletePortfolio(int id)
     {
         var portfolio = await _portfolioRepository.GetByIdAsync(id);
-
+        
         if (portfolio == null)
             return NotFound(new { message = $"Portfolio with ID {id} not found" });
-
+        
         var userId = GetCurrentUserId();
         if (portfolio.UserId != userId)
             return Forbid();
-
+        
         portfolio.IsActive = false;
         portfolio.UpdatedAt = DateTime.UtcNow;
         await _portfolioRepository.UpdateAsync(portfolio);
-
+        
         return Ok(new { message = "Portfolio deleted successfully" });
     }
 }

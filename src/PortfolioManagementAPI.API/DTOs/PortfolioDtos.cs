@@ -1,4 +1,4 @@
-namespace PortfolioManagementAPI.API.DTOs;
+﻿namespace PortfolioManagementAPI.API.DTOs;
 
 public class PortfolioResponse
 {
@@ -10,7 +10,6 @@ public class PortfolioResponse
     public string UserName { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public int ProjectCount { get; set; }
-    public List<ProjectResponse>? Projects { get; set; }
 }
 
 public class CreatePortfolioRequest
